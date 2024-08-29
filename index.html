@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SikandarGPT Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        #header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        #chatbox {
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #ccc;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        #userInput {
+            width: calc(100% - 100px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #sendBtn {
+            width: 80px;
+            padding: 10px;
+            border: none;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            #userInput {
+                width: calc(100% - 90px);
+            }
+            #sendBtn {
+                width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">SikandarGPT</div>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendBtn">Send</button>
+
+    <script>
+        const chatbox = document.getElementById('chatbox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(content, className) {
+            const message = document.createElement('div');
+            message.className = className;
+            message.textContent = content;
+            chatbox.appendChild(message);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        sendBtn.addEventListener('click', () => {
+            const userMessage = userInput.value;
+            if (userMessage.trim()) {
+                addMessage('You: ' + userMessage, 'user');
+                fetch('/chat', {
+                  method: 'POST',
+                  headers: {
+                  'Content-Type': 'application/json'
+                },
+                  body: JSON.stringify({ message: userMessage })
+                }) 
+                .then(response => response.json())
+                .then(data => addMessage('Bot: ' + data.reply, 'bot'))
+                .catch(error => console.error('Error:', error));
+
+            }
+            userInput.value = '';
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendBtn.click();
+        });
+    </script>
+</body>
+</html>
